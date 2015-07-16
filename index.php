@@ -220,18 +220,41 @@ foreach($dbh->query($sql) as $row){
                     <h2 class="section-heading">About us</h2>
                     <hr class="primary">
                     <p>Connectは新居航平・荻原大地の二人の大学生によって運営されています。</p>
+                    <br>
                 </div>
-                <div class="col-lg-6 text-center">
-                    <h3>新居航平</h3><br>
-                    <p>東京工業大学経営システム工学科学部４年<br>
-                    2014年9月〜2015年6月までベルギーのゲント大学に交換留学を経験。ゲント大学在学中に、留学に対する情報が散らばりすぎている。と強く問題意識を感じ、独学でプログラミングを学びこのサービスの開発を始める。留学をした人のその貴重な体験が、Conncetを通じて、下の世代に受け継がれていって欲しい。また留学をきっかけとした、先輩・後輩のような助け合える関係性が自然に構築されていくことを願っている。
-                    </p>
+                <div class="col-lg-4 col-lg-offset-1 text-center">
+                    <a href="#" class="portfolio-box">
+                        <img src="images/IMG_5689.jpg" class="img-responsive" alt="新居航平">
+                        <div class="portfolio-box-caption">
+                            <div class="portfolio-box-caption-content">
+                                <div class="project-category text-faded">
+                                    <h2>新居航平</h2>
+                                </div>
+                                <div class="project-name">
+                                    <p>東京工業大学経営システム工学科学部４年<br><br>
+                                    2014年9月〜2015年6月までベルギーのゲント大学に交換留学を経験。ゲント大学在学中に、留学に対する情報が散らばりすぎている。と強く問題意識を感じ、独学でプログラミングを学びこのサービスの開発を始める。留学をした人のその貴重な体験が、Conncetを通じて、下の世代に受け継がれていって欲しい。また留学をきっかけとした、先輩・後輩のような助け合える関係性が自然に構築されていくことを願っている。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="col-lg-6 text-center">
-                     <h3>荻原大地</h3><br>
-                    東京工業大学経営システム工学科学部４年<br>
-                    2014年9月〜2015年6月までベルギーのゲント大学に交換留学を経験。ゲント大学在学中に、留学に対する情報が散らばりすぎている。と強く問題意識を感じ、独学でプログラミングを学びこのサービスの開発を始める。留学をした人のその貴重な体験が、Conncetを通じて、下の世代に受け継がれていって欲しい。また留学をきっかけとした、先輩・後輩のような助け合える関係性が自然に構築されていくことを願っている。
-                    
+                <div class="col-lg-4 col-lg-offset-2 text-center">
+                    <a href="#" class="portfolio-box">
+                        <img src="images/IMG_6927.jpg" class="img-responsive" alt="荻原大地">
+                        <div class="portfolio-box-caption">
+                            <div class="portfolio-box-caption-content">
+                                <div class="project-category text-faded">
+                                    <h2>荻原大地</h2>
+                                </div>
+                                <div class="project-name">
+                                    <p>東京工業大学工学部機械科学科４年<br><br>
+                                    2014年9月〜2015年6月までベルギーのゲント大学に交換留学を経験。ゲント大学在学中に、留学に対する情報が散らばりすぎている。と強く問題意識を感じ、独学でプログラミングを学びこのサービスの開発を始める。留学をした人のその貴重な体験が、Conncetを通じて、下の世代に受け継がれていって欲しい。また留学をきっかけとした、先輩・後輩のような助け合える関係性が自然に構築されていくことを願っている。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
