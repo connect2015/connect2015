@@ -69,7 +69,7 @@ foreach($dbh->query($sql) as $row){
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" padding-right:10px>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" margin-right:10px>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a class="page-scroll" href="#about">About</a>
@@ -251,8 +251,7 @@ foreach($dbh->query($sql) as $row){
     <!-- Custom Theme JavaScript -->
     <script src="js/creative.js"></script>
     <script src="connect.js"></script>
-
-
+   
 </body>
 
 </html>
