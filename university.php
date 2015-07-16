@@ -1,12 +1,11 @@
-<?php
+<?
 
 require_once('config.php');
 require_once('function.php');
 
 
 //大学のidを取得
-// $id = $_GET['id'];
-$id = 1;
+$id = $_GET['id'];
 
 //データベースに接続
 $dbh = connectDb();
@@ -17,20 +16,12 @@ $stmt = $dbh->prepare($sql['university']);
 $stmt->execute(array(":id" => $id));
 $university = $stmt->fetch();
 
-//ユーザー一覧の取得
-$users = array();
-$sql = "select * from users where university_id = $id";
-foreach($dbh->query($sql) as $row){
-    array_push($users,$row);
-}
-
 //ユーザーのpostsを取得(新しい順)
 $posts = array();
 $sql = "select * from posts where university_id = $id order by modified desc limit 5";
 foreach($dbh->query($sql) as $row){
     array_push($posts,$row);
 }
-var_dump($posts);
 
 //ユーザーのreviewsを取得
 $reviews = array();
@@ -39,22 +30,18 @@ foreach($dbh->query($sql) as $row){
     array_push($reviews,$row);
 }
 
-//ユーザーとreviewの情報をひもづける
-$a = array();
-foreach($reviews as $review){
-    $sql = "select * from users where id =".$review['user_id'];
-    $stmt = $dbh->query($sql);
-    $b = $stmt->fetch(); //ユーザーの情報のarray
-    $row = array_merge($review, $b);
-    array_push($a, $row);
-}
-$reviews = $a;
-
 //カテゴリーの情報読み込み
 $categories = array();
 $sql = "select * from categories";
 foreach ($dbh->query($sql) as $row) {
     array_push($categories, $row);
+}
+
+//ユーザーの情報読み込み
+$users = array();
+$sql = "select * from users where university_id = $id";
+foreach ($dbh->query($sql) as $row) {
+    array_push($users, $row);
 }
 
 //平均点の算出
@@ -89,12 +76,12 @@ endforeach;
         data.addColumn('string', 'カテゴリー');
         data.addColumn('number', 'スコア');
         
-        <?php foreach ($categories as $category) :?>
+        <? foreach ($categories as $category) :?>
          data.addRows([
-            ['<?php echo $category['categoryname'];?>', <?php echo $averages[$category['categoryname']];?>]
+            ['<? echo $category['categoryname'];?>', <? echo $averages[$category['categoryname']];?>]
         ]);
         
-        <?php endforeach;?>
+        <? endforeach;?>
         // グラフのオプションを指定する
         var options = {
             title: 'ゲント大学スコア',
@@ -141,7 +128,7 @@ endforeach;
 
 </head>
 
-<body id="top">
+<body id="page-top">
 
     <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
@@ -154,10 +141,10 @@ endforeach;
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand page-scroll" href="">Connect</a>
+                    <a class="navbar-brand" href="<? echo SITE_URL?>">Connect</a>
                 </div>
-                <div class="navbar-brand topnav" id="bs-example-navbar-collapse-2 col-sm-2　text-center">
-                    <a class="page-scroll" href="#top"><? echo $university['universityname'] ?></a>
+                <div class="navbar-header col-sm-2 text-center">
+                    <a class="navbar-brand page-scroll" href="#page-top"><? echo $university['universityname'];?></a>
                 </div>
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1  col-sm-5">
@@ -220,25 +207,23 @@ endforeach;
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-6 col-md-6 text-center">
+                    <div class="col-sm-5 col-md-6 text-center">
                         <div class="service-box">
                             <div id="chart"></div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-md-6 text-center">
-                        <div class="service-box">
-                            <i class="fa fa-4x wow bounceIn text-primary" data-wow-delay=".1s" style="color:white">
-                                <p>カテゴリ</p>
-                                <p>項目1</p>
-                                <p>項目2</p>
-                                <p>項目3</p>
-                                <p>項目4</p>
-                                <p>項目5</p>
-                                <p>項目6</p>
-                                <p>項目7</p>
-                                <p>項目8</p>
-                            </i>
-                        </div>
+                    <div class="col-sm-5 col-md-6 text-center">
+                        <h3>スコア項目</h3>
+                        <table class="table table-bordered table-hover bg-info">
+                        <thead>
+                          <tr><th>スコア項目</th><th>内容</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>city</td><td>町の様子</td></tr>
+                          <tr><td>university</td><td>大学の質など</td></tr>
+                          <tr><td>food</td><td>ご飯について</td></tr>
+                        </tbody>
+                    </table>
                     </div>
                 </div>
             </div>
@@ -281,30 +266,32 @@ endforeach;
             </div>
             <div class="container">
                 <div class="row">
-                    <? foreach($posts as $post) : ?>
-                        <i class="fa fa-user fa-5x wow col-sm-5 text-center"></i>
-                        <div class="balloon-wrapper col-sm-7 text-left">
-                            <div class="row">
-                                <? 
-                                $i = 0;
-
-                                while ($i == count($posts)) {
-                                    echo $i;
-                                    if($i == $review[$i]['category_id']) {
-                                        break;
-                                    }
-                                    $i++;
-                                }
-                                ?>
-                                <p class="col-sm-7 text-left" style="margin:0px"><? echo $categories[$i-1]['categoryname']?></p>
-                                <p class="col-sm-3 text-right" style="margin:0px">2015/7/15</p>
+                    <? foreach ($reviews as $review): ?>
+                        <div class="col-sm-4">
+                            <div class="thumbnail">
+                                <a href=""><img src="images/168bd8802ac6de1a2515f9df0ad37e937ee45825jpg" alt=""></a>
+                                <div class="caption">
+                                    <h3 class="text-center">
+                                        <a href="user.php?id=<? echo $review['user_id']; ?>">
+                                            <? 
+                                            $a = getuser($review['user_id']);
+                                            echo $a['username'];
+                                            ?>   
+                                        </a>
+                                    </h3>
+                                    <h2 class="text-center" style="background-color:#191970" style="padding:5px">
+                                        <a style="color:white" href="user.php?id=<? echo $review['category_id'] ?>">
+                                            <?
+                                            $b = getcategory($review['category_id']);
+                                            echo $b['categoryname'];
+                                            ?>
+                                        </a>
+                                    </h2>
+                                    <p><? echo $review['body']; ?></p>
+                                </div>
                             </div>
-                            <p class="balloon-left">
-                                <? echo $post['category_id']; ?>
-
-                            </p>
-                        </div>
-                    <? endforeach ; ?>
+                         </div>
+                     <? endforeach; ?>
                 </div>
             </div>
         </section>
@@ -327,12 +314,20 @@ endforeach;
                 <div class=" col-sm-8 col-sm-offset-2">
                     <div class="panel panel-primary"> 
                         <div class="panel-heading" >
-                            <? echo $post['title'] ?>
-                            <span style="float:right">by 
-                                <a href=""></a>
+                            <? echo $post['title'] ?>　by
+                            <a href="user.php?id=<? echo $post['user_id']; ?>">
+                                <?
+
+                                $c = getuser($post['user_id']);
+                                echo $c['username'];
+                                ?>
+                            </a>
+                            <span style="float:right">
+                                <?php echo " posted on ". $post['created'];?>
                             </span>
                         </div>
-                        <div class="panel-body" style="color:#191970">本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文
+                        <div class="panel-body" style="color:#191970">
+                            <? echo $post['body']?>
                         </div>   
                     </div>
                 </div>
@@ -354,38 +349,16 @@ endforeach;
                     </div>
                 </div>
                 <div class="row">
+                    <? foreach ($users as $user) : ?>
                     <div class="col-sm-3 text-center">
                         <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
+                        <p>
+                            <a href="user.php?id=<? echo $user['id']?>">
+                                <? echo $user['username']?>
+                            </a>
+                        </p>
                     </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
-                    <div class="col-sm-3 text-center">
-                        <i class="fa fa-user fa-5x wow bounceIn"></i>
-                        <p>名前</p>
-                    </div>
+                <? endforeach; ?>
                 </div>
             </div>
         </aside>

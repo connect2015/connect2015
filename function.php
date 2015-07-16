@@ -116,3 +116,29 @@ function facebookLogin(){
 
 FacebookLogin();
 
+function getuser($a) {
+  $dbh = connectDb();
+  $sql = "select * from users where id = ".$a;
+  $stmt = $dbh->query($sql);
+  $stmt->execute;
+  $user = $stmt->fetch();
+  return $user;
+}
+
+function getcategory($a){
+  $dbh = connectDb();
+  $sql = "select * from categories where id = ".$a;
+  $stmt = $dbh->query($sql);
+  $stmt->execute;
+  $category = $stmt->fetch();
+  return $category;
+}
+
+function getuniversity($a){
+  $dbh = connectDb();
+  $sql = "select * from universities where id = ".$a;
+  $stmt = $dbh->query($sql);
+  $stmt->execute;
+  $university = $stmt->fetch();
+  return $university;
+}

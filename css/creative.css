@@ -589,3 +589,7 @@ div.titlebar {
     bottom: 0;
     margin: auto;
 }
+
+.thumbnail {
+    border-color:#191970;
+}

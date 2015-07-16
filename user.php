@@ -1,4 +1,4 @@
- <?php 
+ <? 
 require_once('config.php');
 require_once('function.php');
 
@@ -6,22 +6,16 @@ require_once('function.php');
 $dbh = connectDb();
 
 //ユーザーのidを取得
-//$id = $_GET['id'];
-$id = 1;
+$id = $_GET['id'];
 
-
-
-//ユーザー一覧の取得
+//ユーザー情報の取得
 $sql= "select * from users where id = :id limit 1";
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array(":id" => $id));
 $user = $stmt->fetch();
 
 //所属大学情報の取得
-$sql = "select * from universities where id = :id limit 1";
-$stmt = $dbh->prepare($sql);
-$stmt->execute(array(":id" => $user['university_id']));
-$university = $stmt->fetch();
+$university = getuniversity($user['university_id']);
 
 //そのユーザーのpostsを取得(新しい順)
 $posts = array();
@@ -51,8 +45,6 @@ $sql = "select * from categories";
 foreach ($dbh->query($sql) as $row) {
     array_push($categories, $row);
 }
-
-//var_dump($reviews);
 
 ?>
 
@@ -94,7 +86,7 @@ foreach ($dbh->query($sql) as $row) {
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <script src="https://www.google.com/jsapi"></script>
+<script src="https://www.google.com/jsapi"></script>
 <script>
     google.load('visualization', '1.0', {'packages':['corechart']});
     google.setOnLoadCallback(drawChart);
@@ -104,9 +96,9 @@ foreach ($dbh->query($sql) as $row) {
         data.addColumn('string', 'カテゴリー');
         data.addColumn('number', 'スコア');
         
-        <?php foreach ($categories as $category) :?>
+        <? foreach ($categories as $category) :?>
 
-        <?php 
+        <? 
         foreach ($reviews as $review) {
             if($category['id']==$review['category_id']){
             $score = $review['score'];
@@ -114,13 +106,13 @@ foreach ($dbh->query($sql) as $row) {
         }
         ?>
          data.addRows([
-            ['<?php echo $category['categoryname'];?>', <?php echo $score;?>]
+            ['<? echo $category['categoryname'];?>', <? echo $score;?>]
         ]);
         
-        <?php endforeach;?>
+        <? endforeach;?>
         // グラフのオプションを指定する
         var options = {
-            title: "<?php echo $user['username'];?>"+"のスコアグラフ",
+            title: "<? echo $user['username'];?>"+"のスコアグラフ",
             width: 300,
             height: 300
         };
@@ -141,22 +133,25 @@ foreach ($dbh->query($sql) as $row) {
     <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
+            <div class="navbar-header col-sm-5">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand page-scroll" href="index.php">Connect</a>
+                <a class="navbar-brand page-scroll" href="<? echo SITE_URL; ?>">Connect</a>
             </div>
 
-            <div class="nav　navbar-nav navbar-center">
-                <a class="navbar-brand page-scroll" href="#page-top"><?php echo $user['username'];?></a>
+            <div class="navbar-header col-sm-3 text-cemter">
+                <a class="navbar-brand" href="university.php?id=<? echo $university['id']?>">
+                    <? echo $university['universityname']; ?></a>
+                <a class="navbar-brand"> > </a>　
+                <a class="navbar-brand page-scroll" href="#page-top"><? echo $user['username'];?></a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" margin-right:10px>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1 col-sm-5" margin-right:10px>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a class="page-scroll" href="#page-top">profile</a>
@@ -182,7 +177,7 @@ foreach ($dbh->query($sql) as $row) {
                     <img src="kohei.jpg" width="200px" height="180px">
                 </div>
                 <!--
-                <h1><?php echo $user['username'];?></h1>
+                <h1><? echo $user['username'];?></h1>
                 <hr>
                 
                 <div class="container" >
@@ -203,7 +198,7 @@ foreach ($dbh->query($sql) as $row) {
                 -->
                 <div class="panel panel-default">
                   <!-- Default panel contents -->
-                  <div class="panel-heading"><?php echo $user['username'];?></div>
+                  <div class="panel-heading"><? echo $user['username'];?></div>
                   <div class="panel-body">
                     <p>自己紹介文：</p>
                   </div>
@@ -268,28 +263,26 @@ foreach ($dbh->query($sql) as $row) {
         </div>
         <div class="container" style="margin-top:30px;">
             <div class="row">
-                <?php foreach ($reviews as $review) :?>
+                <? foreach ($reviews as $review) :?>
                 <div class="col-sm-5 col-sm-offset-1 text-center">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
 
-                            <?php 
-                            foreach ($categories as $category) {
-                            if($category['id']==$review['category_id']){
-                                echo $category['categoryname'];
-                            }
-                            }?>
+                            <? 
+                            $a = getcategory($review['category_id']);
+                            echo $a['categoryname'];
+                            ?>
                             
                         </div>
                         <div class="panel-body panel-color">
-                          <?php echo $review['body'];?>
+                          <? echo $review['body'];?>
                         </div>
                         <hr class="primary">
                         <div class="fb-comments" data-href="http://localhost/connect2015/post.php?id=1" data-version="v2.3" data-width="300"></div>
                         <div class="fb-like" data-href="http://localhost/facebook_login/trial.php" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"　></div>
                     </div>
                 </div>
-                <?php endforeach;?>   
+                <? endforeach;?>   
                 
                 
             </div>
@@ -308,14 +301,14 @@ foreach ($dbh->query($sql) as $row) {
         <div class="container">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 text-center">
-                    <?php foreach ($posts as $post):?>
+                    <? foreach ($posts as $post):?>
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                          <span class="text-center"><?php echo $post['title'];?></span>
-                          <span style="float:right"><?php echo " posted on ". $post['created'];?></span>
+                          <span class="text-center"><? echo $post['title'];?></span>
+                          <span style="float:right"><? echo " posted on ". $post['created'];?></span>
                         </div>
                         <div class="panel-body"> 
-                          <?php echo $post['body'];?>  
+                          <? echo $post['body'];?>  
                         </div>
                         <hr class="primary">
                         <div class="fb-comments" data-href="http://localhost/connect2015/post.php?id=1" data-version="v2.3"></div>
@@ -323,7 +316,7 @@ foreach ($dbh->query($sql) as $row) {
 
                     </div>
                     
-                    <?php endforeach;?>
+                    <? endforeach;?>
                                    
             </div>
         </div>

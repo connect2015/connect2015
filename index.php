@@ -1,4 +1,4 @@
- <?php 
+ <? 
 require_once('config.php');
 require_once('function.php');
 
@@ -65,7 +65,7 @@ foreach($dbh->query($sql) as $row){
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand page-scroll" href="#page-top">Connect</a>
+                <a class="navbar-brand page-scroll" href=<? echo SITE_URL;?>Connect</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -193,12 +193,12 @@ foreach($dbh->query($sql) as $row){
                     </div>
 
                     <div>
-                            <?php foreach ($universities as $university) :?>
+                            <? foreach ($universities as $university) :?>
                             <h3>
-                            <a href="university.php?id=<?php echo $university['id'];?>" class ="university">
-                            <?php echo $university['universityname']; ?></a>
+                            <a href="university.php?id=<? echo $university['id'];?>" class ="university">
+                            <? echo $university['universityname']; ?></a>
                             </h3>
-                            <?php endforeach; ?>
+                            <? endforeach; ?>
                         
                     </div>
                     
@@ -219,7 +219,7 @@ foreach($dbh->query($sql) as $row){
                 <div class="col-lg-8 col-lg-offset-2 text-center">
                     <h2 class="section-heading">About us</h2>
                     <hr class="primary">
-                    <p>Connectは新居航平・萩原大地の二人の大学生によって運営されています。</p>
+                    <p>Connectは新居航平・荻原大地の二人の大学生によって運営されています。</p>
                 </div>
                 <div class="col-lg-6 text-center">
                     <h3>新居航平</h3><br>
@@ -228,7 +228,7 @@ foreach($dbh->query($sql) as $row){
                     </p>
                 </div>
                 <div class="col-lg-6 text-center">
-                     <h3>萩原大地</h3><br>
+                     <h3>荻原大地</h3><br>
                     東京工業大学経営システム工学科学部４年<br>
                     2014年9月〜2015年6月までベルギーのゲント大学に交換留学を経験。ゲント大学在学中に、留学に対する情報が散らばりすぎている。と強く問題意識を感じ、独学でプログラミングを学びこのサービスの開発を始める。留学をした人のその貴重な体験が、Conncetを通じて、下の世代に受け継がれていって欲しい。また留学をきっかけとした、先輩・後輩のような助け合える関係性が自然に構築されていくことを願っている。
                     
