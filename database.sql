@@ -7,10 +7,18 @@ use connect;
 //usersのテーブル作成
 create table users (
     id int not null auto_increment primary key,
+    facebook_id bigint,
     username varchar(50),
-    password varchar(255),
     email varchar(255),
     university_id int,
+    self_introduction varchar(400),
+    japanese_university varchar(100),
+    study_start date,
+    study_finish date,
+    study_grade varchar(255),
+    study_major varchar(255),
+    birthday date,
+    gender varchar(50), 
     created datetime default null,
     modified datetime default null
 );
@@ -36,6 +44,8 @@ create table reviews (
     created datetime default null,
     modified datetime default null
 );
+
+
 
 //countriesのテーブル作成
 create table countries (

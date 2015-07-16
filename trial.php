@@ -1,114 +1,155 @@
- <?php 
+<?php
+
 require_once('config.php');
 require_once('function.php');
-
-//データベースに接続
-$dbh = connectDb();
-
-//ユーザーのidを取得
-//$id = $_GET['id'];
-$id = 1;
+//session_start();
 
 
 
-//ユーザー一覧の取得
-$sql= "select * from users where id = :id limit 1";
-$stmt = $dbh->prepare($sql);
-$stmt->execute(array(":id" => $id));
-$user = $stmt->fetch();
+if($_SERVER['REQUEST_METHOD'] != 'POST'){
+// CSRF対策
+    setToken();
+}else{
+    //checkToken();
 
-//所属大学情報の取得
-$sql = "select * from universities where id = :id limit 1";
-$stmt = $dbh->prepare($sql);
-$stmt->execute(array(":id" => $user['university_id']));
-$university = $stmt->fetch();
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $university_id = $_POST['university_id'];
 
-//そのユーザーのpostsを取得(新しい順)
-$posts = array();
-$sql = "select * from posts where user_id = $id order by modified desc limit 10";
-foreach($dbh->query($sql) as $row){
-    array_push($posts,$row);
+    $dbh = connectDb();
+
+    $err = array();
+
+    //名前が空か？
+    if($name ==''){
+        $err['name'] = 'insert your name';
+    }
+
+    //メールアドレスが正しいのか
+    if(!filter_var($email,FILTER_VALIDATE_EMAIL)){
+        $err['email'] = 'this is not validate form of email';
+    }
+
+    if(emailExist($email,$dbh)){
+        $err['email'] = 'this email address is already used';
+    }
+
+
+
+    //メールアドレスが空か？
+    if($email ==''){
+        $err['email'] = 'insert your email';
+    }
+
+
+    //パスワードが空か？
+    if($password ==''){
+        $err['password'] = 'insert your password';
+    }
+
+
+    if(empty($err)){
+        //エラーがからだった場合にのみ、登録処理をする
+    $sql = "insert into users
+        (username, email, password, university_id, created, modified) 
+        values
+        (:name, :email, :password, :university_id, now(),now())";
+
+
+    $stmt = $dbh->prepare($sql);
+
+    $params = array(
+        ":name"=> $name,
+        ":email"=>$email,
+        ":password"=> getSha1Password($password),
+        ":university_id"=>$university_id
+        );
+
+    $stmt->execute($params);
+
+    //header('Location:'.SITE_URL.'login.php');
+    exit;
+    }
+
 }
 
-//そのユーザーのreviewsを取得
-$reviews = array();
-$sql = "select * from reviews where user_id = $id";
-foreach($dbh->query($sql) as $row){
-    array_push($reviews,$row);
-}
-
-//そのユーザーの写真を取得
-$images = array();
-$sql = "select * from images where user_id = $id";
-foreach($dbh->query($sql) as $row){
-    array_push($images,$row);
-}
-
-
-//カテゴリーの情報読み込み
-$categories = array();
-$sql = "select * from categories";
-foreach ($dbh->query($sql) as $row) {
-    array_push($categories, $row);
-}
-
-//var_dump($reviews);
 
 ?>
 
-<html>
-
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-    <script src="https://www.google.com/jsapi"></script>
-<script>
-    google.load('visualization', '1.0', {'packages':['corechart']});
-    google.setOnLoadCallback(drawChart);
-    
-    function drawChart() {
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'カテゴリー');
-        data.addColumn('number', 'スコア');
-        
-        <?php foreach ($categories as $category) :?>
-
-        <?php 
-        foreach ($reviews as $review) {
-            if($category['id']==$review['category_id']){
-            $score = $review['score'];
-        }
-        }
-        ?>
-         data.addRows([
-            ['<?php echo $category['categoryname'];?>', <?php echo $score;?>]
-        ]);
-        
-        <?php endforeach;?>
-        // グラフのオプションを指定する
-        var options = {
-            title: "<?php echo $user['username'];?>"+"のスコアグラフ",
-            width: 500,
-            height: 500
-        };
-
-        // 描画する
-        var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
-        chart.draw(data, options);
-    }
-
-</script>
-
+    <meta charset="UTF-8">
+    <title>new user signup</title>
 </head>
+
 <body>
+    <a href="index.php">Top</a>
 
-<div id="chart"></div>
+<h1>new user signup</h1>
+<form action="" method="POST">
+    <p>
+        Name<input type="text" name="name" value="<?php echo h($name); ?>">
+        <?php echo h($err['name']); ?>
+    </p>
+    <p>
+        Email Address<input type="text" name="email" value="<?php echo h($email); ?>">
+        <?php echo h($err['email']); ?>
+    </p>
+
+<?php
+//university data inserting
+$dbh = connectDb();
+
+$universities = array();
+
+$sql = "select * from universities";
+foreach ($dbh->query($sql) as $row) {
+    array_push($universities, $row);
+}
+
+?>
+
+<?php
+//country data inserting
+$dbh = connectDb();
+
+$countries = array();
+
+$sql = "select * from countries";
+foreach ($dbh->query($sql) as $row) {
+    array_push($countries, $row);
+}
+?>
 
 
-<div  style ="background-color:blue; width:200px; height:200px;">
-<div style = "background-color:red; width:300px; height:300px;">
+    <p>
+        Country:
+        <select name="countryname">
+        <?php foreach ($countries as $country) : ?>
+        <option value=""><?php echo h($country['countryname']); ?></option>
+        <?php endforeach; ?>
+        </select>
+    </p>
 
-</div>
+    <p>
+        University:
+        <select name="university_id">
+        <?php foreach ($universities as $university) : ?>
+        <option value="<?php echo h($university['id']); ?>"><?php echo h($university['universityname']); ?></option>
+        <?php endforeach; ?>
+        </select>
+    </p>
 
-</div>
+    
+
+    <p>
+        password<input type="password" name="password" value="">
+        <?php echo h($err['password']); ?>
+    </p>
+    <input type="hidden" name="token" value="<?php echo h($_SESSION['token']); ?>">
+    <P><input type="submit" value="new sign up"><a href="index.php">back to home</a></P>
 
 </body>
 </html>
