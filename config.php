@@ -3,12 +3,12 @@
 //データベース関連
 define('DSN', 'mysql:host=localhost;dbname=connect');
 define('DB_USER', 'dbuser');
-define('DB_PASSWORD', 'connect2015');
+define('DB_PASSWORD', 'kohei1993');
 
 //facebook関連
-define('APP_ID', '1588772488021580');
-define('APP_SECRET', '0049bd6e09b21a3fd257461f7b675ec2');
-define('FACEBOOK_SDK_V4_SRC_DIR', '/Applications/MAMP/htdocs/connect2015/facebook-php-sdk-v4/src/Facebook/');
+define('APP_ID', '436865333162259');
+define('APP_SECRET', 'e5734ceef09b1e70dbaea90660ede073');
+//define('FACEBOOK_SDK_V4_SRC_DIR', '/Applications/MAMP/htdocs/connect2015/facebook-php-sdk-v4/src/Facebook/');
 
 
 //画像関連

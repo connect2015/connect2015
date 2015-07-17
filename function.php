@@ -1,10 +1,9 @@
 <?php
-
-use Facebook\FacebookSession;
-use Facebook\FacebookRequest;
-use Facebook\GraphUser;
-use Facebook\FacebookRequestException;
-use Facebook\FacebookJavaScriptLoginHelper;
+//use Facebook\FacebookSession;
+//use Facebook\FacebookRequest;
+//use Facebook\GraphUser;
+//use Facebook\FacebookRequestException;
+//use Facebook\FacebookJavaScriptLoginHelper;
 
 function connectDb(){
 	try {
@@ -39,10 +38,10 @@ function emailExist($email, $dbh){
 	return $user ? true : false;
 }
 
-function user_idExist($user_id, $dbh){
-	$sql = "select * from users where id = :user_id limit 1";
+function userExist($facebook_id, $dbh){
+	$sql = "select * from users where facebook_id = :facebook_id limit 1";
 	$stmt = $dbh->prepare($sql);
-	$stmt->execute(array(":user_id" => $user_id));
+	$stmt->execute(array(":facebook_id" => $facebook_id));
 	$user = $stmt->fetch();
 	return $user ? true : false;
 }
@@ -53,6 +52,7 @@ function getSha1Password($s){
 	return (sha1(PASSWORD_KEY.$s));
 }
 
+/*
 function facebookLogin(){
 
   require '/Applications/MAMP/htdocs/connect2015/facebook-php-sdk-v4/autoload.php';
@@ -82,24 +82,15 @@ function facebookLogin(){
       ))->execute()->getGraphObject(GraphUser::className());
       $username = $user_profile->getName();    
       $user_url = $user_profile->getLink();
-      $user_id = $user_profile->getId();
-      //var_dump($user_profile);
-
+      $facebook_id = $user_profile->getId();
+      
       //新規登録されてるかチェック
       $dbh = connectDb();
-      if(!user_idExist($user_id,$dbh)){
+      //ユーザーがいなかったなら・・・
+      if(!userExist($facebook_id,$dbh)){
       
-        //新規登録処理
-        $sql = "insert into users
-        (id, username, created, modified) 
-        values
-        (:user_id, :name, now(),now())";
-        $stmt = $dbh->prepare($sql);
-        $params = array(
-          ":user_id"=> $user_id,
-          ":name"=> $username,
-          );
-        $stmt->execute($params);
+        //新規登録処理ページへ飛ぶ
+        //header('Location:'.SITE_URL.'signup.php');
       }
       
 
@@ -114,8 +105,8 @@ function facebookLogin(){
   echo "<script src='connect.js'></script>";
 }
 
-FacebookLogin();
-
+facebookLogin();
+*/
 function getuser($a) {
   $dbh = connectDb();
   $sql = "select * from users where id = ".$a;
@@ -142,3 +133,19 @@ function getuniversity($a){
   $university = $stmt->fetch();
   return $university;
 }
+
+
+function Login(){
+session_start();
+require_once __DIR__ . '/facebook-php-sdk-v4-5.0-dev/src/Facebook/autoload.php';
+$fb = new Facebook\Facebook([
+  'app_id' => APP_ID,
+  'app_secret' => APP_SECRET,
+  'default_graph_version' => 'v2.3',
+  ]);
+$helper = $fb->getRedirectLoginHelper();
+$permissions = ['email']; // Optional permissions
+$loginUrl = $helper->getLoginUrl('http://localhost/connect2015/signup.php', $permissions);
+echo '<a href="' . $loginUrl . '">Log in with Facebook!</a>';
+}
+

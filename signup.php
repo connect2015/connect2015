@@ -1,18 +1,9 @@
- <?php 
-require_once('config.php');
-require_once('function.php');
+<?php
+session_start();
 
-//データベースに接続
-$dbh = connectDb();
-
-
-//universityの情報を取得
-$universities = array();
-$sql = "select * from universities";
-foreach($dbh->query($sql) as $row){
-    array_push($universities,$row);
-}
-
+require_once __DIR__ . '/facebook-php-sdk-v4-5.0-dev/src/Facebook/autoload.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/function.php';
 
 //登録処理
 if($_SERVER['REQUEST_METHOD'] != 'POST'){
@@ -21,6 +12,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
 }else{
     //checkToken();
 
+    $facebook_id = $_POST['facebook_id'];
     $username = $_POST['username'];
     $email = $_POST['email'];
     $university_id = $_POST['university_id'];
@@ -38,19 +30,19 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
 
 
     $sql = 'Insert into users
-        (username, email, university_id, self_introduction, japanese_university,
+        (facebook_id, username, email, university_id, self_introduction, japanese_university,
             study_start, study_finish, study_grade, study_major, birthday, gender, created, modified) 
         values
-        (:username, :email, :university_id, :self_introduction, :japanese_university,
+        (:facebook_id, :username, :email, :university_id, :self_introduction, :japanese_university,
             :study_start, :study_finish, :study_grade, :study_major, :birthday, :gender, now(),now())';
 
 
-    $sql="insert into users (username,gender) values(:username,:gender);";
     $stmt = $dbh->prepare($sql);
 
     $params = array(
+        ':facebook_id'=> $facebook_id,
         ':username'=> $username,
-        /*':email'=>$email,
+        ':email'=>$email,
         ':university_id'=>$university_id,
         ':self_introduction'=> $self_introduction,
         ':japanese_university'=>$japanese_university,
@@ -58,26 +50,128 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         ':study_finish'=> $study_finish,
         ':study_grade'=>$study_grade,
         ':study_major'=>$study_major,
-        ':birthday'=> $birthday,*/
+        ':birthday'=> $birthday,
         ':gender'=>$gender
         );
 
     $stmt->execute($params);
-    // $sql="select * from users;";
-    
-    // $stmt=$dbh->prepare($sql);
-    
-    var_dump($stmt->execute($params));
-    
-   
-
+    header('Location:'.SITE_URL.'index.php');
 exit;
 
 }
 
+$fb = new Facebook\Facebook([
+  'app_id' => APP_ID,
+  'app_secret' => APP_SECRET,
+  'default_graph_version' => 'v2.3',
+  ]);
+
+$helper = $fb->getRedirectLoginHelper();
+
+try {
+  $accessToken = $helper->getAccessToken();
+} catch(Facebook\Exceptions\FacebookResponseException $e) {
+  // When Graph returns an error
+  echo 'Graph returned an error: ' . $e->getMessage();
+  exit;
+} catch(Facebook\Exceptions\FacebookSDKException $e) {
+  // When validation fails or other local issues
+  echo 'Facebook SDK returned an error: ' . $e->getMessage();
+  exit;
+}
+
+if (! isset($accessToken)) {
+  if ($helper->getError()) {
+    //header('HTTP/1.0 401 Unauthorized');
+    echo "Error: " . $helper->getError() . "\n";
+    echo "Error Code: " . $helper->getErrorCode() . "\n";
+    echo "Error Reason: " . $helper->getErrorReason() . "\n";
+    echo "Error Description: " . $helper->getErrorDescription() . "\n";
+  } else {
+    //header('HTTP/1.0 400 Bad Request');
+    echo 'Bad request';
+  }
+  exit;
+}
+
+// Logged in
+//echo '<h3>Access Token</h3>';
+//var_dump($accessToken->getValue());
+//echo $accessToken->getValue();
+
+// The OAuth 2.0 client handler helps us manage access tokens
+$oAuth2Client = $fb->getOAuth2Client();
+
+// Get the access token metadata from /debug_token
+$tokenMetadata = $oAuth2Client->debugToken($accessToken);
+//echo '<h3>Metadata</h3>';
+//var_dump($tokenMetadata);
+
+// Validation (these will throw FacebookSDKException's when they fail)
+//var_dump($config);
+//$tokenMetadata->validateAppId($config['app_id']);
+
+// If you know the user ID this access token belongs to, you can validate it here
+//$tokenMetadata->validateUserId('123');
+$tokenMetadata->validateExpiration();
+
+if (! $accessToken->isLongLived()) {
+  // Exchanges a short-lived access token for a long-lived one
+  try {
+    $accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
+  } catch (Facebook\Exceptions\FacebookSDKException $e) {
+    echo "<p>Error getting long-lived access token: " . $helper->getMessage() . "</p>\n\n";
+    exit;
+  }
+
+  echo '<h3>Long-lived</h3>';
+  var_dump($accessToken->getValue());
+}
 
 
-?>
+try {
+  // Returns a `Facebook\FacebookResponse` object
+  $response = $fb->get('/me?fields=id,name', $accessToken->getValue());
+} catch(Facebook\Exceptions\FacebookResponseException $e) {
+  echo 'Graph returned an error: ' . $e->getMessage();
+  exit;
+} catch(Facebook\Exceptions\FacebookSDKException $e) {
+  echo 'Facebook SDK returned an error: ' . $e->getMessage();
+  exit;
+}
+
+$user = $response->getGraphUser();
+
+
+//データベースに接続
+$dbh = connectDb();
+
+
+//universityの情報を取得
+$universities = array();
+$sql = "select * from universities";
+foreach($dbh->query($sql) as $row){
+    array_push($universities,$row);
+}
+
+//ユーザーが登録されているかチェック
+if(userExist($user['id'],$dbh)){
+  header('Location:'.SITE_URL.'index.php');
+  }
+
+
+
+
+
+
+
+/*
+
+$_SESSION['fb_access_token'] = (string) $accessToken;
+var_dump($_SESSION['fb_access_token'] );
+// User is logged in with a long-lived access token.
+// You can redirect them to a members-only page.
+//header('Location: https://example.com/members.php');*/?>
 
 
 
@@ -119,7 +213,8 @@ exit;
 </head>
 
 <body>
-
+    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();" auto_logout_link="true">
+</fb:login-button>
     <div class="container" style="padding:20px 0">
     
           <form class="form-horizontal" style="margin-bottom:15px;" action="" method="post">
@@ -127,7 +222,7 @@ exit;
             <div class="form-group">
               <label class="control-label col-sm-2" for="username">お名前</label>
               <div class="col-sm-6">
-                <input type="text" name="username" class="form-control" placeholder="name">
+                <input type="text" name="username" class="form-control" placeholder="name" value="<?php echo $user['name'];?>">
               </div>
               <div class="col-sm-1">
                 <h4><span class="label label-danger">必須</span></h4>
@@ -232,7 +327,7 @@ exit;
               </div>
             
             </div>
-            
+            <input type="hidden" name="facebook_id" value="<?php echo $user['id']; ?>">
             <div class="form-group">
               <div class="col-sm-offset-7 col-sm-2">
                 <input type="submit" value="submit" class="btn btn-primary">

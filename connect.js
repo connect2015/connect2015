@@ -9,7 +9,7 @@
     // for FB.getLoginStatus().
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-
+      document.getElementById('status').innerHTML = 'You are logged in already';
       //新規登録チェック
 
       //新規登録処理
@@ -81,7 +81,7 @@
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
+      document.getElementById('status2').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
       });
   }
