@@ -134,6 +134,14 @@ function getuniversity($a){
   return $university;
 }
 
+function getimage($a){
+  $dbh = connectDb();
+  $sql = "select * from images where id = ".$a;
+  $stmt = $dbh->query($sql);
+  $stmt->execute;
+  $image = $stmt->fetch();
+  return $image;
+}
 
 function Login(){
 session_start();

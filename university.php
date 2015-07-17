@@ -317,7 +317,6 @@ endforeach;
                             <? echo $post['title'] ?>　by
                             <a href="user.php?id=<? echo $post['user_id']; ?>">
                                 <?
-
                                 $c = getuser($post['user_id']);
                                 echo $c['username'];
                                 ?>
@@ -327,6 +326,14 @@ endforeach;
                             </span>
                         </div>
                         <div class="panel-body" style="color:#191970">
+                            <p class="text-center">
+                            <?
+                            $a = getimage($post['image_id']);
+                            if($a) {
+                                echo '<img class="panel" src="images/'.$a['filename'].'">';
+                            }
+                            ?>
+                            </p>
                             <? echo $post['body']?>
                         </div>   
                     </div>

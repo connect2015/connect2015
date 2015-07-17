@@ -65,7 +65,7 @@ foreach($dbh->query($sql) as $row){
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand page-scroll" href=<? echo SITE_URL;?>Connect</a>
+                <a class="navbar-brand page-scroll" href="<? echo SITE_URL;?>">Connect</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
