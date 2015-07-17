@@ -1,4 +1,6 @@
 <?php
+function Login(){
+
 session_start();
 require_once __DIR__ . '/facebook-php-sdk-v4-5.0-dev/src/Facebook/autoload.php';
 
@@ -17,4 +19,5 @@ $loginUrl = $helper->getLoginUrl('http://localhost/connect2015/signup.php', $per
 
 
 echo '<a href="' . $loginUrl . '">Log in with Facebook!</a>';
+}
 ?>
